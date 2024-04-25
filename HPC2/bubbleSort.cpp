@@ -1,93 +1,78 @@
 #include <iostream>
+#include <vector>
 #include <omp.h>
 using namespace std;
 
-void swap(int &a, int &b)
+// Function to perform Bubble Sort
+void sequential_bubbleSort(vector<int> &arr)
 {
-    int test;
-    test = a;
-    a = b;
-    b = test;
-}
-
-void sequentialBubbleSort(int *a, int n)
-{
-    int swapped;
-    for (int i = 0; i < n; i++)
+    int n = arr.size();
+    for (int i = 0; i < n - 1; ++i)
     {
-        swapped = 0;
-        for (int j = 0; j < n - 1; j++)
+        for (int j = 0; j < n - i - 1; ++j)
         {
-            if (a[j] > a[j + 1])
+            if (arr[j] > arr[j + 1])
             {
-                swap(a[j], a[j + 1]);
-                swapped = 1;
+                swap(arr[j], arr[j + 1]);
             }
         }
-
-        if (!swapped)
-            break;
     }
 }
 
-void parallelBubbleSort(int *a, int n)
+// Parallel Bubble Sort
+void parallelBubbleSort(vector<int> &arr)
 {
-    int swapped;
-    for (int i = 0; i < n; i++)
+    int n = arr.size();
+    for (int i = 0; i < n - 1; ++i)
     {
-        swapped = 0;
-        int first=i%2;
-        #pragma omp parallel for shared(a,first)
-        for (int j = first; j < n - 1; j++)
+#pragma omp parallel for
+        for (int j = 0; j < n - i - 1; ++j)
         {
-            if (a[j] > a[j + 1])
+            if (arr[j] > arr[j + 1])
             {
-                swap(a[j], a[j + 1]);
-                swapped = 1;
+                swap(arr[j], arr[j + 1]);
             }
         }
-        if (!swapped)
-            break;
     }
 }
 
 int main()
 {
-    int *a, n;
+    int n;
     cout << "\n enter total no of elements=>";
     cin >> n;
-    a = new int[n];
+    vector<int>arr(n);
+    vector<int>arr_copy(n);
     cout << "\n enter elements=>";
     for (int i = 0; i < n; i++)
     {
-        cin >> a[i];
+        cin >> arr[i];
+        arr_copy[i]=arr[i];
     }
 
     double start_time = omp_get_wtime(); // start timer for sequential algorithm
-    sequentialBubbleSort(a, n);
+    sequential_bubbleSort(arr);
     double end_time = omp_get_wtime(); // end timer for sequential algorithm
-
-    cout << "\n sorted array is=>";
-    for (int i = 0; i < n; i++)
-    {
-        cout << a[i] << endl;
-    }
-
     cout << "Time taken by sequential algorithm: " << end_time - start_time << " seconds" << endl;
 
+    cout << "\n sorted array is=>";
+    for (int i = 0; i < n; i++)
+    {
+        cout << arr[i] << endl;
+    }
+
+
     start_time = omp_get_wtime(); // start timer for parallel algorithm
-    parallelBubbleSort(a, n);
+    parallelBubbleSort(arr_copy);
     end_time = omp_get_wtime(); // end timer for parallel algorithm
+    cout << "Time taken by parallel algorithm: " << end_time - start_time << " seconds" << endl;
 
     cout << "\n sorted array is=>";
     for (int i = 0; i < n; i++)
     {
-        cout << a[i] << endl;
+        cout << arr_copy[i] << endl;
     }
 
-    cout << "Time taken by parallel algorithm: " << end_time - start_time << " seconds" << endl;
-
-    delete[] a; // Don't forget to free the allocated memory
 
     return 0;
 }
