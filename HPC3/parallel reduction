@@ -26,6 +26,49 @@ void max_reduction(int arr[], int n) {
   cout << "Maximum value: " << max_value << endl;
 }
 
+
+// void min_reduction(int arr[], int n) {
+//   int min_value = INT_MAX;
+//   #pragma omp parallel
+//   {
+//     int local_min_value = INT_MAX;
+//     #pragma omp for
+//     for (int i = 0; i < n; i++) {
+//       if (arr[i] < local_min_value) {
+//         local_min_value = arr[i];
+//       }
+//     }
+//     #pragma omp critical
+//     {
+//       if (local_min_value < min_value) {
+//         min_value = local_min_value;
+//       }
+//     }
+//   }
+//   cout << "Minimum value: " << min_value << endl;
+// }
+
+// void max_reduction(int arr[], int n) {
+//   int max_value = INT_MIN;
+//   #pragma omp parallel
+//   {
+//     int local_max_value = INT_MIN;
+//     #pragma omp for
+//     for (int i = 0; i < n; i++) {
+//       if (arr[i] > local_max_value) {
+//         local_max_value = arr[i];
+//       }
+//     }
+//     #pragma omp critical
+//     {
+//       if (local_max_value > max_value) {
+//         max_value = local_max_value;
+//       }
+//     }
+//   }
+//   cout << "Maximum value: " << max_value << endl;
+// }
+
 void sum_reduction(int arr[], int n) {
   int sum = 0;
    #pragma omp parallel for reduction(+: sum)
@@ -66,46 +109,3 @@ int main() {
 
 //  g++ -fopenmp assignment3.cpp -o ans
 //  ./ans
-
-
-// void min_reduction(vector<int>& arr) {
-//   int min_value = INT_MAX;
-//   #pragma omp parallel
-//   {
-//     int local_min_value = INT_MAX;
-//     #pragma omp for
-//     for (int i = 0; i < arr.size(); i++) {
-//       if (arr[i] < local_min_value) {
-//         local_min_value = arr[i];
-//       }
-//     }
-//     #pragma omp critical
-//     {
-//       if (local_min_value < min_value) {
-//         min_value = local_min_value;
-//       }
-//     }
-//   }
-//   cout << "Minimum value: " << min_value << endl;
-// }
-
-// void max_reduction(vector<int>& arr) {
-//   int max_value = INT_MIN;
-//   #pragma omp parallel
-//   {
-//     int local_max_value = INT_MIN;
-//     #pragma omp for
-//     for (int i = 0; i < arr.size(); i++) {
-//       if (arr[i] > local_max_value) {
-//         local_max_value = arr[i];
-//       }
-//     }
-//     #pragma omp critical
-//     {
-//       if (local_max_value > max_value) {
-//         max_value = local_max_value;
-//       }
-//     }
-//   }
-//   cout << "Maximum value: " << max_value << endl;
-// }
