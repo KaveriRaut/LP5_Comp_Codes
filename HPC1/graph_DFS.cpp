@@ -9,32 +9,30 @@ const int MAX = 100000;
 vector<int> graph[MAX];
 bool visited[MAX];
 
-void dfs(int node) {
+void dfs(int start_node) {
     stack<int> s;
-    s.push(node);
+    s.push(start_node);
 
     while (!s.empty()) {
         int curr_node;
-        #pragma omp parallel shared(s) private(curr_node)
+        #pragma omp critical
         {
-            #pragma omp critical
-            {
-                curr_node = s.top();
-                s.pop();
-            }
+            curr_node = s.top();
+            s.pop();
+        }
 
-            if (!visited[curr_node]) {
-                visited[curr_node] = true;
-                cout << curr_node << " ";
-
-                #pragma omp for
-                for (int i = 0; i < graph[curr_node].size(); i++) {
-                    int adj_node = graph[curr_node][i];
+        if (!visited[curr_node]) {
+            visited[curr_node] = true;
+            cout << curr_node << " ";
+            
+            // Traverse all adjacent vertices
+            #pragma omp parallel for
+            for (int i = 0; i < graph[curr_node].size(); i++) {
+                int adj_node = graph[curr_node][i];
+                if (!visited[adj_node]) {
                     #pragma omp critical
                     {
-                        if (!visited[adj_node]) {
-                            s.push(adj_node);
-                        }
+                        s.push(adj_node);
                     }
                 }
             }
@@ -42,41 +40,38 @@ void dfs(int node) {
     }
 }
 
-
 int main() {
-	int n, m, start_node;
-	cout<<"Enter no. of Node,no. of Edges and Starting Node of graph:\n";
-	cin >> n >> m >> start_node;
-         //n: node,m:edges
-        cout<<"Enter pair of node and edges:\n";
+    int n, m, start_node;
+    cout << "Enter no. of Node, no. of Edges, and Starting Node of graph:\n";
+    cin >> n >> m >> start_node;
 
-	for (int i = 0; i < m; i++) {
-    	int u, v;
-    	cin >> u >> v;
-    	
-//u and v: Pair of edges
-    	graph[u].push_back(v);
-    	graph[v].push_back(u);
-	}
+    cout << "Enter pair of node and edges:\n";
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
 
-	#pragma omp parallel for
-	for (int i = 0; i < n; i++) {
-    	visited[i] = false;
-	}
+    // Mark all vertices as not visited
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        visited[i] = false;
+    }
 
-	double start_time_bfs = omp_get_wtime(); // start timer for parallel BFS
+    double start_time_dfs = omp_get_wtime(); // start timer for parallel DFS
 
     cout << "Parallel DFS traversal: ";
     dfs(start_node);
     cout << endl;
 
-    double end_time_bfs = omp_get_wtime(); // end timer for parallel BFS
+    double end_time_dfs = omp_get_wtime(); // end timer for parallel DFS
 
-    cout << "\nTime taken by parallel DFS: " << end_time_bfs - start_time_bfs << " seconds" << endl;
+    cout << "\nTime taken by parallel DFS: " << end_time_dfs - start_time_dfs << " seconds" << endl;
 
-
-	return 0;
+    return 0;
 }
+
 
 /*output
 Enter no. of Node,no. of Edges and Starting Node of graph:
