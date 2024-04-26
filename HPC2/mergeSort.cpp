@@ -8,26 +8,7 @@ using namespace std;
 // void merge(int a[],int i1,int j1,int i2,int j2);
 
 
-// parallel MergeSort algo
-void parallel_mergesort(vector<int> &arr,int i,int j)
-{
-    int mid;
-    if(i<j)
-    {
-        mid=(i+j)/2;
-        
-        #pragma omp parallel sections 
-        {
-            #pragma omp section
-                parallel_mergesort(arr,i,mid);        
-            
-            #pragma omp section
-                parallel_mergesort(arr,mid+1,j);    
-        }
 
-        merge(arr,i,mid,mid+1,j);    
-    }
-}
  
 // Function to merge two sorted subarrays
 void merge(vector<int> &arr,int i1,int j1,int i2,int j2)
@@ -80,6 +61,27 @@ void recursive_mergeSort(vector<int> &arr, int l, int r)
     }
 }
 
+// parallel MergeSort algo
+void parallel_mergesort(vector<int> &arr,int i,int j)
+{
+    int mid;
+    if(i<j)
+    {
+        mid=(i+j)/2;
+        
+        #pragma omp parallel sections 
+        {
+            #pragma omp section
+                parallel_mergesort(arr,i,mid);        
+            
+            #pragma omp section
+                parallel_mergesort(arr,mid+1,j);    
+        }
+
+        merge(arr,i,mid,mid+1,j);    
+    }
+}
+
 
 int main()
 {
@@ -111,11 +113,16 @@ int main()
     par_time = end_time - start_time;
     cout << "\nParallel Time: " << par_time << endl;
     
-    cout<<"\n sorted array is=>";
+    cout<<"\n sequentially sorted array is=>";
     for(i=0;i<n;i++)
     {
-        cout<<"\n"<<arr[i];
-        cout<<"\n"<<arr_copy[i];
+        cout<<arr[i]<<" ";
+    }
+    cout<<endl;
+    cout<<"\n parallely sorted array is=>";
+    for(i=0;i<n;i++)
+    {
+        cout<<arr_copy[i]<<" ";
     }
        
     return 0;
